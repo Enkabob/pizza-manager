@@ -199,102 +199,112 @@ export default function PizzaApp() {
 
           {/* SEARCH BAR */}
           {(activeTab === 'door' || activeTab === 'counter') && (
-            <div className="mb-6 relative group">
-              <Search className="absolute left-6 top-5 text-red-600" size={24} />
-              <input className="w-full p-5 pl-16 rounded-[2.5rem] border-4 border-slate-900 bg-[#161010] text-white text-xl shadow-2xl focus:border-amber-500 outline-none transition-all font-bold" placeholder="Search a smasher..." value={search} onChange={(e)=>setSearch(e.target.value)} />
-            </div>
+          <div className="mb-4 sm:mb-6 relative group">
+              <Search className="absolute left-5 top-4 sm:left-6 sm:top-5 text-red-600" size={20} />
+              <input 
+                  className="w-full p-4 pl-12 sm:p-5 sm:pl-16 rounded-[2rem] sm:rounded-[2.5rem] border-4 border-slate-900 bg-[#161010] text-white text-lg sm:text-xl shadow-2xl focus:border-amber-500 outline-none transition-all font-bold" 
+                  placeholder="Search..." 
+                  value={search} 
+                  onChange={(e)=>setSearch(e.target.value)} 
+              />
+          </div>
           )}
 
           {/* THE DOOR (CHECK-IN) */}
-          {activeTab === 'door' && (
-              <div className="space-y-3">
-                  {filtered.map(o => (
-                    <div key={o.id} className="bg-[#1a1111] p-5 rounded-[2rem] border-2 border-slate-900 flex justify-between items-center shadow-xl transition-all">
-                      <div className="flex-1 cursor-pointer" onClick={() => { setEditingOrder(o); setIsModalOpen(true); }}>
-                        <div className="font-black text-3xl leading-tight text-white hover:text-amber-400 italic tracking-tighter transition-colors">{stripPrefix(o.player_name)}</div>
-                        <div className="text-xs font-black uppercase italic tracking-widest mt-2 flex items-center gap-2">
-                          <span className="text-amber-500">{o.topping}</span>
-                          <span className="text-red-600 bg-red-600/10 px-2 py-0.5 rounded border border-red-600/20">{o.slice_count} SLICES</span>
-                          <span className="text-slate-600">{o.drink}</span>
+            {activeTab === 'door' && (
+                <div className="space-y-3 pb-32">
+                    {filtered.map(o => (
+                    <div key={o.id} className="bg-[#1a1111] p-4 sm:p-5 rounded-[1.5rem] sm:rounded-[2rem] border-2 border-slate-900 flex justify-between items-center shadow-xl transition-all">
+                        <div className="flex-1 cursor-pointer min-w-0 pr-2" onClick={() => { setEditingOrder(o); setIsModalOpen(true); }}>
+                        <div className="font-black text-xl sm:text-3xl leading-tight text-white hover:text-amber-400 italic tracking-tighter transition-colors truncate">
+                            {stripPrefix(o.player_name)}
                         </div>
-                      </div>
-                      <button 
+                        <div className="text-[10px] sm:text-xs font-black uppercase italic tracking-widest mt-1 sm:mt-2 flex flex-wrap items-center gap-2">
+                            <span className="text-amber-500">{o.topping}</span>
+                            <span className="text-red-600 bg-red-600/10 px-2 py-0.5 rounded border border-red-600/20 whitespace-nowrap">{o.slice_count} SLICES</span>
+                        </div>
+                        </div>
+                        <button 
                         onClick={() => toggleStatus(o.id, 'is_paid', o.is_paid)} 
-                        className={`ml-4 px-6 py-4 rounded-2xl font-black text-md shadow-2xl transition-all border-b-4 active:translate-y-1 active:border-b-0 ${o.is_paid ? 'bg-green-600 text-white border-green-800 scale-105 shadow-green-900/40' : 'bg-slate-800 text-slate-600 border-slate-950 opacity-40'}`}
-                      >
+                        className={`shrink-0 px-4 py-3 sm:px-6 sm:py-4 rounded-xl sm:rounded-2xl font-black text-xs sm:text-md shadow-2xl transition-all border-b-4 active:translate-y-1 active:border-b-0 ${o.is_paid ? 'bg-green-600 text-white border-green-800 scale-105 shadow-green-900/40' : 'bg-slate-800 text-slate-600 border-slate-950 opacity-40'}`}
+                        >
                         {o.is_paid ? 'PAID' : 'CASH'}
-                      </button>
+                        </button>
                     </div>
-                  ))}
-              </div>
-          )}
+                    ))}
+                </div>
+            )}
 
           {/* THE OVEN */}
-          {activeTab === 'oven' && (
-            <div className="space-y-6 animate-in zoom-in-95 duration-300">
-              <div className="bg-[#1a1111] p-10 rounded-[3rem] border-t-8 border-red-600 shadow-2xl relative overflow-hidden">
-                <div className="absolute top-4 right-6 opacity-5"><Utensils size={80}/></div>
-                <h3 className="font-black text-amber-500 text-[10px] uppercase mb-10 tracking-[0.4em] border-b-2 border-amber-500/10 pb-4 italic text-center">Kitchen Tickets</h3>
+            {activeTab === 'oven' && (
+            <div className="space-y-4 sm:space-y-6 animate-in zoom-in-95 duration-300 pb-32">
+                <div className="bg-[#1a1111] p-6 sm:p-10 rounded-[2rem] sm:rounded-[3rem] border-t-8 border-red-600 shadow-2xl relative overflow-hidden">
+                <div className="absolute top-4 right-6 opacity-5"><Utensils size={50} className="sm:w-20 sm:h-20"/></div>
+                <h3 className="font-black text-amber-500 text-[10px] uppercase mb-6 sm:mb-10 tracking-[0.4em] border-b-2 border-amber-500/10 pb-4 italic text-center">Kitchen Tickets</h3>
+                
                 {Object.entries(toppingTally).map(([t, count]: any) => {
-                  const totalSlices = count * 2;
-                  const totalPizzas = Math.ceil(totalSlices / 8);
-                  const extraSlices = (totalPizzas * 8) - totalSlices;
-                  return (
-                    <div key={t} className="flex justify-between items-center mb-10 last:mb-0">
-                      <div>
-                        <div className="text-3xl font-black text-white leading-none mb-1 italic tracking-tighter">{t}</div>
-                        <div className="text-slate-500 font-black text-xl uppercase tracking-widest">{totalSlices} SLICES</div>
-                      </div>
-                      <div className="text-right">
-                        <div className="text-amber-500 font-black text-5xl leading-none tracking-normal">{totalPizzas} <span className="text-[14px]">BOXES</span></div>
-                        <div className="text-[12px] text-red-600 font-black uppercase mt-1">+{extraSlices} EXTRAS</div>
-                      </div>
+                    const totalSlices = count * 2;
+                    const totalPizzas = Math.ceil(totalSlices / 8);
+                    const extraSlices = (totalPizzas * 8) - totalSlices;
+                    return (
+                    <div key={t} className="flex flex-row justify-between items-start sm:items-center mb-6 sm:mb-10 last:mb-0 gap-4">
+                        <div className="min-w-0 flex-1">
+                        <div className="text-2xl sm:text-3xl font-black text-white leading-none mb-1 italic tracking-tighter break-words">{t}</div>
+                        <div className="text-slate-500 font-black text-sm sm:text-xl uppercase tracking-widest">{totalSlices} SLICES</div>
+                        </div>
+                        <div className="text-right shrink-0">
+                        <div className="text-amber-500 font-black text-4xl sm:text-5xl leading-none tracking-tighter">{totalPizzas} <span className="text-[10px]">BOXES</span></div>
+                        <div className="text-[10px] text-red-600 font-black uppercase mt-1">+{extraSlices} EXTRAS</div>
+                        </div>
                     </div>
-                  );
+                    );
                 })}
-              </div>
-              <div className="bg-[#1a1111] p-8 rounded-[3rem] border-t-8 border-amber-600 shadow-2xl">
-                <h3 className="font-black text-amber-500 text-[10px] uppercase mb-6 tracking-[0.4em] border-b-2 border-amber-500/10 pb-4 italic text-center">Bar Inventory</h3>
+                </div>
+
+                <div className="bg-[#1a1111] p-6 sm:p-8 rounded-[2rem] sm:rounded-[3rem] border-t-8 border-amber-600 shadow-2xl">
+                <h3 className="font-black text-amber-500 text-[10px] uppercase mb-4 sm:mb-6 tracking-[0.4em] border-b-2 border-amber-500/10 pb-4 italic text-center">Bar Inventory</h3>
                 {Object.entries(drinkTally).map(([d, count]: any) => (
-                  <div key={d} className="flex justify-between py-4 border-b border-slate-800 last:border-0 font-black text-3xl items-center">
-                    <span className="text-slate-400 italic lowercase tracking-tighter">{d}</span> 
-                    <span className="text-amber-500">x{count}</span>
-                  </div>
+                    <div key={d} className="flex justify-between py-3 sm:py-4 border-b border-slate-800 last:border-0 font-black text-xl sm:text-3xl items-center">
+                    <span className="text-slate-400 italic lowercase tracking-tighter truncate pr-4">{d}</span> 
+                    <span className="text-amber-500 whitespace-nowrap">x{count}</span>
+                    </div>
                 ))}
-              </div>
+                </div>
             </div>
-          )}
+            )}
 
           {/* THE COUNTER */}
-          {activeTab === 'counter' && (
-              <div className="space-y-5">
-                  {filtered.filter(o => o.is_paid).map(o => (
-                      <div key={o.id} className={`relative p-8 rounded-[2.5rem] flex justify-between items-center transition-all duration-500 overflow-hidden border-b-8
+            {activeTab === 'counter' && (
+                <div className="space-y-4 pb-32"> {/* Added pb-32 so you can scroll past the FAB */}
+                    {filtered.filter(o => o.is_paid).map(o => (
+                        <div key={o.id} className={`relative p-5 sm:p-8 rounded-[2rem] sm:rounded-[2.5rem] flex justify-between items-center gap-3 transition-all duration-500 overflow-hidden border-b-8
                         ${o.is_collected 
-                          ? 'opacity-10 bg-black grayscale scale-95 border-transparent' 
-                          : 'bg-[#1e1414] border-red-900 shadow-2xl ring-2 ring-white/5'
+                            ? 'opacity-10 bg-black grayscale scale-95 border-transparent' 
+                            : 'bg-[#1e1414] border-red-900 shadow-2xl ring-2 ring-white/5'
                         }`}
-                      >
-                        <div className="flex-1 z-10">
-                          <div className="font-black text-4xl leading-none text-white mb-4 tracking-tighter italic drop-shadow-xl">{stripPrefix(o.player_name)}</div>
-                          <div className="flex flex-col gap-1">
-                            <div className="font-black text-amber-500 text-2xl uppercase tracking-tighter flex items-center gap-3">
-                                {o.topping} <span className="text-slate-700 text-lg font-black">• {o.slice_count} SLICES</span>
+                        >
+                        <div className="flex-1 z-10 min-w-0"> {/* min-w-0 fixes text overflow issues */}
+                            <div className="font-black text-2xl sm:text-4xl leading-tight text-white mb-2 sm:mb-4 tracking-tighter italic drop-shadow-xl break-words">
+                                {stripPrefix(o.player_name)}
                             </div>
-                            <div className="text-slate-500 text-xl font-black italic mt-1 flex items-center gap-2 uppercase tracking-widest text-[14px]">
+                            <div className="flex flex-col gap-0.5 sm:gap-1">
+                            <div className="font-black text-amber-500 text-lg sm:text-2xl uppercase tracking-tighter flex flex-wrap items-center gap-2">
+                                {o.topping} <span className="text-slate-700 text-sm sm:text-lg font-black whitespace-nowrap">• {o.slice_count} SLICES</span>
+                            </div>
+                            <div className="text-slate-500 text-sm sm:text-xl font-black italic mt-1 flex items-center gap-2 uppercase tracking-widest">
                                 <span className="opacity-40">🥤</span> {o.drink} <span className="text-[10px] opacity-50 bg-slate-800 px-2 py-1 rounded-lg">x{o.drink_count}</span>
                             </div>
-                          </div>
+                            </div>
                         </div>
-                        <button onClick={() => toggleStatus(o.id, 'is_collected', o.is_collected)} className={`px-12 py-10 rounded-[2.2rem] font-black text-2xl shadow-2xl transition-all active:scale-90 z-10 border-b-8
-                          ${o.is_collected ? 'bg-slate-900 text-slate-800 border-transparent' : 'bg-gradient-to-br from-red-600 to-red-800 text-white border-red-950 shadow-red-950/40'}`}
+                        <button onClick={() => toggleStatus(o.id, 'is_collected', o.is_collected)} className={`shrink-0 px-6 py-6 sm:px-12 sm:py-10 rounded-2xl sm:rounded-[2.2rem] font-black text-lg sm:text-2xl shadow-2xl transition-all active:scale-90 z-10 border-b-4 sm:border-b-8
+                            ${o.is_collected ? 'bg-slate-900 text-slate-800 border-transparent' : 'bg-gradient-to-br from-red-600 to-red-800 text-white border-red-950 shadow-red-950/40'}`}
                         >
-                          {o.is_collected ? 'SERVED' : 'SERVE!'}
+                            {o.is_collected ? 'DONE' : 'SERVE!'}
                         </button>
-                      </div>
-                  ))}
-              </div>
-          )}
+                        </div>
+                    ))}
+                </div>
+            )}
         </div>
       </main>
 
@@ -304,55 +314,56 @@ export default function PizzaApp() {
       </button>
 
       {/* NEW PIZZA TICKET MODAL */}
-      {isModalOpen && (
-        <div className="fixed inset-0 bg-black/95 backdrop-blur-xl z-50 flex items-center justify-center p-6 animate-in fade-in duration-200">
-          <div className="bg-[#1e1515] w-full max-w-lg rounded-[2rem] p-8 border-x-8 border-red-900/50 shadow-[0_0_100px_rgba(211,47,47,0.15)] relative overflow-hidden">
-            {/* Ticket Edge Decoration */}
+        {isModalOpen && (
+        <div className="fixed inset-0 bg-black/95 backdrop-blur-xl z-50 flex items-center justify-center p-4 sm:p-6 animate-in fade-in duration-200">
+            {/* Changed p-8 to p-6 for mobile */}
+            <div className="bg-[#1e1515] w-full max-w-lg rounded-[2rem] p-6 sm:p-8 border-x-8 border-red-900/50 shadow-[0_0_100px_rgba(211,47,47,0.15)] relative overflow-hidden">
             <div className="absolute top-0 left-0 right-0 h-2 bg-red-700 opacity-50" style={{backgroundImage: 'radial-gradient(circle, transparent 70%, #1e1515 70%)', backgroundSize: '20px 20px'}}></div>
             
-            <button onClick={() => { setIsModalOpen(false); setEditingOrder(null); }} className="absolute top-6 right-6 text-slate-700 hover:text-red-500 transition-colors"><X size={32}/></button>
+            <button onClick={() => { setIsModalOpen(false); setEditingOrder(null); }} className="absolute top-4 right-4 sm:top-6 sm:right-6 text-slate-700 hover:text-red-500 transition-colors"><X size={28} /></button>
             
-            <h2 className="text-3xl font-black mb-8 uppercase italic text-amber-500 tracking-tighter">{editingOrder ? 'Edit Ticket' : 'New Ticket'}</h2>
+            <h2 className="text-2xl sm:text-3xl font-black mb-6 sm:mb-8 uppercase italic text-amber-500 tracking-tighter">{editingOrder ? 'Edit Ticket' : 'New Ticket'}</h2>
             
-            <form onSubmit={saveManualOrder} className="space-y-6">
-              <div className="relative">
-                 <label className="text-[10px] font-black text-red-800 uppercase tracking-widest absolute -top-2 left-4 bg-[#1e1515] px-2">Player Tag</label>
-                 <input name="player_name" defaultValue={editingOrder?.player_name} placeholder="GamerTag" required className="w-full bg-black/40 p-5 rounded-xl text-2xl border-2 border-slate-900 text-white focus:border-amber-500 outline-none font-black italic shadow-inner" />
-              </div>
+            <form onSubmit={saveManualOrder} className="space-y-5 sm:space-y-6">
+                <div className="relative">
+                    <label className="text-[10px] font-black text-red-800 uppercase tracking-widest absolute -top-2 left-4 bg-[#1e1515] px-2">Player Tag</label>
+                    {/* Reduced text size for inputs on mobile */}
+                    <input name="player_name" defaultValue={editingOrder?.player_name} placeholder="GamerTag" required className="w-full bg-black/40 p-4 sm:p-5 rounded-xl text-xl sm:text-2xl border-2 border-slate-900 text-white focus:border-amber-500 outline-none font-black italic shadow-inner" />
+                </div>
 
-              <div className="grid grid-cols-5 gap-4">
+                <div className="grid grid-cols-5 gap-3 sm:gap-4">
                 <div className="col-span-3 relative">
                     <label className="text-[10px] font-black text-red-800 uppercase tracking-widest absolute -top-2 left-4 bg-[#1e1515] px-2">Topping</label>
-                    <select name="topping" defaultValue={editingOrder?.topping || 'Pepperoni'} className="w-full bg-black/40 p-5 rounded-xl text-lg text-white border-2 border-slate-900 font-black italic appearance-none focus:border-amber-500">
+                    <select name="topping" defaultValue={editingOrder?.topping || 'Pepperoni'} className="w-full bg-black/40 p-4 sm:p-5 rounded-xl text-md sm:text-lg text-white border-2 border-slate-900 font-black italic appearance-none focus:border-amber-500">
                         {menu.toppings.map(t => <option key={t} value={t} className="bg-slate-900">{t}</option>)}
                     </select>
                 </div>
                 <div className="col-span-2 relative">
                     <label className="text-[10px] font-black text-red-800 uppercase tracking-widest absolute -top-2 left-4 bg-[#1e1515] px-2 flex items-center gap-1"><Hash size={10}/> Slices</label>
-                    <input name="slice_count" type="number" defaultValue={editingOrder?.slice_count || 2} className="w-full bg-black/40 p-5 rounded-xl text-lg text-white border-2 border-slate-900 font-black focus:border-amber-500 outline-none" />
+                    <input name="slice_count" type="number" defaultValue={editingOrder?.slice_count || 2} className="w-full bg-black/40 p-4 sm:p-5 rounded-xl text-md sm:text-lg text-white border-2 border-slate-900 font-black focus:border-amber-500 outline-none" />
                 </div>
-              </div>
+                </div>
 
-              <div className="grid grid-cols-5 gap-4">
+                <div className="grid grid-cols-5 gap-3 sm:gap-4">
                 <div className="col-span-3 relative">
                     <label className="text-[10px] font-black text-red-800 uppercase tracking-widest absolute -top-2 left-4 bg-[#1e1515] px-2">Drink</label>
-                    <select name="drink" defaultValue={editingOrder?.drink || 'Coke'} className="w-full bg-black/40 p-5 rounded-xl text-lg text-white border-2 border-slate-900 font-black italic appearance-none focus:border-amber-500">
+                    <select name="drink" defaultValue={editingOrder?.drink || 'Coke'} className="w-full bg-black/40 p-4 sm:p-5 rounded-xl text-md sm:text-lg text-white border-2 border-slate-900 font-black italic appearance-none focus:border-amber-500">
                         {menu.drinks.map(d => <option key={d} value={d} className="bg-slate-900">{d}</option>)}
                     </select>
                 </div>
                 <div className="col-span-2 relative">
                     <label className="text-[10px] font-black text-red-800 uppercase tracking-widest absolute -top-2 left-4 bg-[#1e1515] px-2 flex items-center gap-1"><Beer size={10}/> Qty</label>
-                    <input name="drink_count" type="number" defaultValue={editingOrder?.drink_count || 1} className="w-full bg-black/40 p-5 rounded-xl text-lg text-white border-2 border-slate-900 font-black focus:border-amber-500 outline-none" />
+                    <input name="drink_count" type="number" defaultValue={editingOrder?.drink_count || 1} className="w-full bg-black/40 p-4 sm:p-5 rounded-xl text-md sm:text-lg text-white border-2 border-slate-900 font-black focus:border-amber-500 outline-none" />
                 </div>
-              </div>
+                </div>
 
-              <button type="submit" className="w-full bg-red-700 text-white p-6 rounded-2xl font-black text-2xl mt-4 border-b-8 border-red-950 active:translate-y-2 active:border-b-0 transition-all shadow-xl flex items-center justify-center gap-3">
-                <Save size={24}/> {editingOrder ? 'UPDATE TICKET' : 'PRINT TICKET'}
-              </button>
+                <button type="submit" className="w-full bg-red-700 text-white p-5 sm:p-6 rounded-2xl font-black text-xl sm:text-2xl mt-4 border-b-8 border-red-950 active:translate-y-2 active:border-b-0 transition-all shadow-xl flex items-center justify-center gap-3">
+                <Save size={24}/> {editingOrder ? 'UPDATE' : 'PRINT'}
+                </button>
             </form>
-          </div>
+            </div>
         </div>
-      )}
+        )}
 
       {/* FOOTER NAV */}
       <nav className="flex-none bg-black/80 backdrop-blur-3xl border-t-4 border-slate-900 flex justify-around p-4 pb-12 z-40">
