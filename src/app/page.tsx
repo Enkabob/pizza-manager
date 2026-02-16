@@ -246,8 +246,8 @@ export default function PizzaApp() {
                         <div className="text-slate-500 font-black text-xl uppercase tracking-widest">{totalSlices} SLICES</div>
                       </div>
                       <div className="text-right">
-                        <div className="text-amber-500 font-black text-5xl leading-none tracking-tighter">{totalPizzas} <span className="text-[10px]">BOXES</span></div>
-                        <div className="text-[10px] text-red-600 font-black uppercase mt-1">+{extraSlices} EXTRAS</div>
+                        <div className="text-amber-500 font-black text-5xl leading-none tracking-normal">{totalPizzas} <span className="text-[14px]">BOXES</span></div>
+                        <div className="text-[12px] text-red-600 font-black uppercase mt-1">+{extraSlices} EXTRAS</div>
                       </div>
                     </div>
                   );
