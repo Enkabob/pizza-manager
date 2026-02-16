@@ -7,7 +7,7 @@ A real-time pizza order management system designed for the BttLA tournaments. Bu
 ![Project Status](https://img.shields.io/badge/Status-Cooking-orange?style=for-the-badge)
 ![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)
 
-### Visit our Vercel Page and launch from your phone or pc browser [here](https://pizza-manager-lime.vercel.app)
+# Visit our Vercel Page and launch from your phone or pc browser ->[here](https://pizza-manager-lime.vercel.app)<-
 
 ## 🕹️ Features
 
