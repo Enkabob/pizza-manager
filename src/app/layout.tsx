@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'Tournament Pizza Tracker 🍕', // <--- This changes the browser tab
+  title: 'Pizza Tracker 🍕', // <--- This changes the browser tab
   description: 'The ultimate bracket-runner fuel management system.',
 }
 

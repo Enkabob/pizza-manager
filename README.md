@@ -2,7 +2,7 @@
 
 > "Winner gets the last slice."
 
-A high-octane, real-time pizza order management system designed for Fighting Game Community (FGC) tournaments. Built to handle the chaos of "The Door", calculate box efficiency in "The Oven", and ensure every smasher gets fed at "The Counter".
+A real-time pizza order management system designed for the BttLA tournaments. Built to handle the chaos of food ordering, calculating pizza requirements, and ensure every smasher gets fed .
 
 ![Project Status](https://img.shields.io/badge/Status-Cooking-orange?style=for-the-badge)
 ![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)
@@ -12,7 +12,7 @@ A high-octane, real-time pizza order management system designed for Fighting Gam
 The app is divided into four distinct "Stations" to manage the workflow:
 
 ### 🚪 **The Door (Check-In)**
-- **Roster Sync**: Upload `start.gg` CSV exports to auto-populate the hungry player list.
+- **Roster Sync**: Upload `start.gg` CSV exports to auto-populate the player list.
 - **Payment Tracking**: One-tap toggle to mark players as **PAID** or **CASH**.
 - **Live Search**: Instant filtering to find a Gamertag in a sea of hungry competitors.
 
