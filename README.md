@@ -15,21 +15,25 @@ The app is divided into four distinct "Stations" to manage the workflow:
 - **Roster Sync**: Upload `start.gg` CSV exports to auto-populate the player list.
 - **Payment Tracking**: One-tap toggle to mark players as **PAID** or **CASH**.
 - **Live Search**: Instant filtering to find a Gamertag in a sea of hungry competitors.
+![Door](image-1.png)
 
 ### 🔥 **The Oven (Metrics)**
 - **Smart Math**: Automatically converts individual slice orders into total pizza boxes needed.
 - **Inventory**: Tracks drink counts (e.g., "How many Cokes do we need?").
 - **Visual Tickets**: Kitchen-style tally for easy referencing by staff.
+![Oven](image.png)
 
 ### 🍽️ **The Counter (Distribution)**
 - **The Feed**: A filtered view of only **PAID** players.
 - **Serve Mode**: One-tap "SERVE!" button that grays out the ticket and marks the order as collected.
 - **Visuals**: Distinct styling for unpaid vs. paid vs. served orders.
+![Food](image-2.png)
 
 ### 📋 **Prep Station (Admin)**
 - **Event Management**: Switch between tournament slugs (e.g., `weekly-smash-40`).
 - **Data Persistence**: LocalStorage remembers your active event and history.
 - **Supabase Sync**: Real-time database subscription ensures all staff devices stay in sync instantly.
+![Prep](image-3.png)
 
 ## 🛠️ Tech Stack
 

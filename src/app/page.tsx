@@ -14,7 +14,9 @@ export default function PizzaApp() {
   const [inputSlug, setInputSlug] = useState(''); // The text inside the input box
   
   const [orders, setOrders] = useState<any[]>([]);
-  const [menu, setMenu] = useState<{toppings: string[], drinks: string[]}>({ toppings: [], drinks: [] });
+  const [menu, setMenu] = useState<{toppings: any[], drinks: any[]}>({ toppings: [], drinks: [] });
+  const [newMenuLabel, setNewMenuLabel] = useState('');
+  const [newMenuCategory, setNewMenuCategory] = useState('topping');
   const [recentSlugs, setRecentSlugs] = useState<string[]>([]);
   const [search, setSearch] = useState('');
   
@@ -72,14 +74,34 @@ export default function PizzaApp() {
     setOrders(data || []);
   }
   async function fetchMenu() {
-    const { data } = await supabase.from('menu_options').select('*');
+    const { data } = await supabase.from('menu_options').select('*').order('label');
     if (data) {
       setMenu({
-        toppings: data.filter(m => m.category === 'topping').map(m => m.label),
-        drinks: data.filter(m => m.category === 'drink').map(m => m.label)
+        toppings: data.filter(m => m.category === 'topping'),
+        drinks: data.filter(m => m.category === 'drink')
       });
     }
   }
+
+  // 3. ADD NEW FUNCTIONS
+  const addMenuItem = async (e: any) => {
+    e.preventDefault();
+    if (!newMenuLabel) return;
+    
+    await supabase.from('menu_options').insert({ 
+      category: newMenuCategory, 
+      label: newMenuLabel 
+    });
+    
+    setNewMenuLabel('');
+    fetchMenu();
+  };
+
+  const deleteMenuItem = async (id: string) => {
+    if (!confirm('Remove this item from the menu?')) return;
+    await supabase.from('menu_options').delete().eq('id', id);
+    fetchMenu();
+  };
 
   const stripPrefix = (name: string) => {
     if (!name) return "";
@@ -189,6 +211,69 @@ export default function PizzaApp() {
                   <span className="text-red-500 font-black text-lg uppercase italic">Drop start.gg CSV</span>
                   <input type="file" accept=".csv" className="hidden" onChange={handleUpload} />
                 </label>
+              </div>
+              
+              <div className="bg-[#1a1111] p-6 sm:p-8 rounded-[2rem] border-t-8 border-amber-600 shadow-2xl mt-6">
+                <h2 className="text-lg font-black mb-6 flex items-center gap-2 text-amber-500 uppercase italic">
+                  <Settings2 size={20}/> Menu Config
+                </h2>
+
+                {/* ADD NEW ITEM FORM */}
+                <form onSubmit={addMenuItem} className="flex flex-col sm:flex-row gap-3 mb-8">
+                  <select 
+                    value={newMenuCategory} 
+                    onChange={(e) => setNewMenuCategory(e.target.value)}
+                    className="bg-black/40 border-2 border-slate-800 p-3 rounded-xl text-white font-bold outline-none focus:border-amber-500"
+                  >
+                    <option value="topping">Topping</option>
+                    <option value="drink">Drink</option>
+                  </select>
+                  
+                  <input 
+                    className="flex-1 bg-black/40 border-2 border-slate-800 p-3 rounded-xl text-white font-bold outline-none focus:border-amber-500 placeholder:text-slate-700 italic" 
+                    placeholder="New item name..." 
+                    value={newMenuLabel}
+                    onChange={(e) => setNewMenuLabel(e.target.value)}
+                  />
+                  
+                  <button type="submit" className="bg-amber-500 text-black px-6 py-3 rounded-xl font-black uppercase shadow-lg hover:scale-105 transition-transform">
+                    Add
+                  </button>
+                </form>
+
+                {/* LIST ITEMS */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+                  
+                  {/* TOPPINGS LIST */}
+                  <div>
+                    <h3 className="text-red-500 font-black uppercase text-xs tracking-widest mb-3 border-b border-red-900/30 pb-2">Toppings</h3>
+                    <div className="space-y-2">
+                      {menu.toppings.map(item => (
+                        <div key={item.id} className="flex justify-between items-center group">
+                          <span className="font-bold text-slate-300 italic">{item.label}</span>
+                          <button onClick={() => deleteMenuItem(item.id)} className="text-slate-700 hover:text-red-500 transition-colors opacity-50 group-hover:opacity-100">
+                            <Trash2 size={16}/>
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* DRINKS LIST */}
+                  <div>
+                    <h3 className="text-amber-500 font-black uppercase text-xs tracking-widest mb-3 border-b border-amber-900/30 pb-2">Drinks</h3>
+                    <div className="space-y-2">
+                      {menu.drinks.map(item => (
+                        <div key={item.id} className="flex justify-between items-center group">
+                          <span className="font-bold text-slate-300 italic">{item.label}</span>
+                          <button onClick={() => deleteMenuItem(item.id)} className="text-slate-700 hover:text-red-500 transition-colors opacity-50 group-hover:opacity-100">
+                            <Trash2 size={16}/>
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
               </div>
 
               <div className="bg-red-950/10 p-6 rounded-[2.5rem] border-2 border-red-900/20 text-center">
@@ -335,7 +420,9 @@ export default function PizzaApp() {
                 <div className="col-span-3 relative">
                     <label className="text-[10px] font-black text-red-800 uppercase tracking-widest absolute -top-2 left-4 bg-[#1e1515] px-2">Topping</label>
                     <select name="topping" defaultValue={editingOrder?.topping || 'Pepperoni'} className="w-full bg-black/40 p-4 sm:p-5 rounded-xl text-md sm:text-lg text-white border-2 border-slate-900 font-black italic appearance-none focus:border-amber-500">
-                        {menu.toppings.map(t => <option key={t} value={t} className="bg-slate-900">{t}</option>)}
+                           {menu.toppings.map(t => (
+                              <option key={t.id} value={t.label} className="bg-slate-900">{t.label}</option>
+                          ))}
                     </select>
                 </div>
                 <div className="col-span-2 relative">
@@ -348,7 +435,9 @@ export default function PizzaApp() {
                 <div className="col-span-3 relative">
                     <label className="text-[10px] font-black text-red-800 uppercase tracking-widest absolute -top-2 left-4 bg-[#1e1515] px-2">Drink</label>
                     <select name="drink" defaultValue={editingOrder?.drink || 'Coke'} className="w-full bg-black/40 p-4 sm:p-5 rounded-xl text-md sm:text-lg text-white border-2 border-slate-900 font-black italic appearance-none focus:border-amber-500">
-                        {menu.drinks.map(d => <option key={d} value={d} className="bg-slate-900">{d}</option>)}
+                        {menu.drinks.map(d => (
+                            <option key={d.id} value={d.label} className="bg-slate-900">{d.label}</option>
+                        ))}
                     </select>
                 </div>
                 <div className="col-span-2 relative">
