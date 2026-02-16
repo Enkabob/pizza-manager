@@ -361,43 +361,126 @@ export default function PizzaApp() {
                 </div>
             )}
 
-          {/* THE OVEN */}
-            {activeTab === 'oven' && (
-            <div className="space-y-4 sm:space-y-6 animate-in zoom-in-95 duration-300 pb-32">
-                <div className="bg-[#1a1111] p-6 sm:p-10 rounded-[2rem] sm:rounded-[3rem] border-t-8 border-red-600 shadow-2xl relative overflow-hidden">
-                <div className="absolute top-4 right-6 opacity-5"><Utensils size={50} className="sm:w-20 sm:h-20"/></div>
-                <h3 className="font-black text-amber-500 text-[10px] uppercase mb-6 sm:mb-10 tracking-[0.4em] border-b-2 border-amber-500/10 pb-4 italic text-center">Kitchen Tickets</h3>
-                
-                {Object.entries(toppingTally).map(([t, count]: any) => {
-                    const totalSlices = count * 2;
-                    const totalPizzas = Math.ceil(totalSlices / 8);
-                    const extraSlices = (totalPizzas * 8) - totalSlices;
-                    return (
-                    <div key={t} className="flex flex-row justify-between items-start sm:items-center mb-6 sm:mb-10 last:mb-0 gap-4">
-                        <div className="min-w-0 flex-1">
-                        <div className="text-2xl sm:text-3xl font-black text-white leading-none mb-1 italic tracking-tighter break-words">{t}</div>
-                        <div className="text-slate-500 font-black text-sm sm:text-xl uppercase tracking-widest">{totalSlices} SLICES</div>
+          {/* THE OVEN (KITCHEN MATH) - STRICT HALVES COMPACTOR */}
+          {activeTab === 'oven' && (() => {
+            // 1. Calculate how many "Sides" (4-slice halves) each topping needs
+            // Each order is 2 slices. A side is 4 slices.
+            const toppingSides: { topping: string, type: 'FULL' | 'PARTIAL' }[] = [];
+            
+            const counts: Record<string, number> = {};
+            paidOrders.forEach(o => { counts[o.topping] = (counts[o.topping] || 0) + Number(o.slice_count); });
+
+            Object.entries(counts).forEach(([topping, totalSlices]) => {
+              let slicesLeft = totalSlices;
+              
+              while (slicesLeft >= 4) {
+                toppingSides.push({ topping, type: 'FULL' });
+                slicesLeft -= 4;
+              }
+              if (slicesLeft > 0) {
+                toppingSides.push({ topping, type: 'PARTIAL' });
+              }
+            });
+
+            // 2. Pack the Sides into Boxes (2 sides per box)
+            const boxes: { sideA: any, sideB: any }[] = [];
+            let pool = [...toppingSides];
+
+            // STRATEGY: Try to keep the same topping in the same box first
+            const uniqueToppings = [...new Set(pool.map(s => s.topping))];
+            
+            uniqueToppings.forEach(t => {
+              const matchingSides = pool.filter(s => s.topping === t);
+              // If a topping has 2 sides (e.g. 3 orders = 1 Full + 1 Partial), put them together
+              while (matchingSides.length >= 2) {
+                const sA = matchingSides.shift()!;
+                const sB = matchingSides.shift()!;
+                boxes.push({ sideA: sA, sideB: sB });
+                // Remove from main pool
+                pool.splice(pool.indexOf(sA), 1);
+                pool.splice(pool.indexOf(sB), 1);
+              }
+            });
+
+            // 3. Pair remaining different toppings into boxes
+            while (pool.length > 0) {
+              const sideA = pool.shift()!;
+              const sideB = pool.shift() || null; // Might be empty if total sides are odd
+              boxes.push({ sideA, sideB });
+            }
+
+            return (
+              <div className="space-y-6 animate-in zoom-in-95 duration-300 pb-32">
+                <div className="bg-[#1a1111] p-8 rounded-[3rem] border-t-8 border-red-600 shadow-2xl">
+                  <h3 className="font-black text-amber-500 text-[10px] uppercase mb-8 tracking-[0.4em] border-b-2 border-amber-500/10 pb-4 italic text-center">Shop Call List</h3>
+                  
+                  <div className="space-y-6">
+                    {boxes.map((box, i) => {
+                      const isWhole = box.sideB && box.sideA.topping === box.sideB.topping && box.sideA.type === 'FULL' && box.sideB.type === 'FULL';
+                      const is75Percent = box.sideB && box.sideA.topping === box.sideB.topping && box.sideB.type === 'PARTIAL';
+                      
+                      return (
+                        <div key={i} className={`bg-black/20 p-6 rounded-[2rem] border-l-8 shadow-xl transition-all ${isWhole ? 'border-green-600' : 'border-amber-600'}`}>
+                          <div className="flex justify-between items-center mb-4">
+                            <span className="text-[10px] font-black text-amber-600 uppercase tracking-widest italic">Pizza #{i+1}</span>
+                            {isWhole && <span className="text-green-500 font-black text-[10px] uppercase italic">100% Full</span>}
+                            {is75Percent && <span className="text-blue-400 font-black text-[10px] uppercase italic">75% {box.sideA.topping}</span>}
+                          </div>
+
+                          <div className="space-y-4">
+                            {/* SIDE A */}
+                            <div className="flex justify-between items-center">
+                              <div>
+                                <div className="text-[8px] font-black text-slate-600 uppercase mb-1">Side A (50%)</div>
+                                <div className="text-2xl font-black text-white uppercase italic tracking-tighter">{box.sideA.topping}</div>
+                              </div>
+                              {box.sideA.type === 'PARTIAL' && <span className="bg-red-900/30 text-red-500 text-[9px] font-black px-2 py-1 rounded border border-red-500/20">2 EMPTY SLICES</span>}
+                            </div>
+
+                            <div className="h-[1px] bg-white/5 w-full"></div>
+
+                            {/* SIDE B */}
+                            <div className="flex justify-between items-center">
+                              {box.sideB ? (
+                                <>
+                                  <div>
+                                    <div className="text-[8px] font-black text-slate-600 uppercase mb-1">Side B (50%)</div>
+                                    <div className="text-2xl font-black text-white uppercase italic tracking-tighter">{box.sideB.topping}</div>
+                                  </div>
+                                  {box.sideB.type === 'PARTIAL' && <span className="bg-red-900/30 text-red-500 text-[9px] font-black px-2 py-1 rounded border border-red-500/20">2 EMPTY SLICES</span>}
+                                </>
+                              ) : (
+                                <div className="py-2">
+                                  <div className="text-[8px] font-black text-slate-800 uppercase mb-1">Side B</div>
+                                  <div className="text-2xl font-black text-slate-800 uppercase italic">--- EMPTY ---</div>
+                                </div>
+                              )}
+                            </div>
+                          </div>
                         </div>
-                        <div className="text-right shrink-0">
-                        <div className="text-amber-500 font-black text-4xl sm:text-5xl leading-none tracking-tighter">{totalPizzas} <span className="text-[10px]">BOXES</span></div>
-                        <div className="text-[10px] text-red-600 font-black uppercase mt-1">+{extraSlices} EXTRAS</div>
-                        </div>
-                    </div>
-                    );
-                })}
+                      );
+                    })}
+
+                    {boxes.length === 0 && (
+                      <div className="text-center py-20 opacity-20 italic font-black uppercase tracking-widest">No paid orders yet</div>
+                    )}
+                  </div>
                 </div>
 
-                <div className="bg-[#1a1111] p-6 sm:p-8 rounded-[2rem] sm:rounded-[3rem] border-t-8 border-amber-600 shadow-2xl">
-                <h3 className="font-black text-amber-500 text-[10px] uppercase mb-4 sm:mb-6 tracking-[0.4em] border-b-2 border-amber-500/10 pb-4 italic text-center">Bar Inventory</h3>
-                {Object.entries(drinkTally).map(([d, count]: any) => (
-                    <div key={d} className="flex justify-between py-3 sm:py-4 border-b border-slate-800 last:border-0 font-black text-xl sm:text-3xl items-center">
-                    <span className="text-slate-400 italic lowercase tracking-tighter truncate pr-4">{d}</span> 
-                    <span className="text-amber-500 whitespace-nowrap">x{count}</span>
+                {/* DRINK TALLY */}
+                <div className="bg-[#1a1111] p-8 rounded-[3rem] border-t-8 border-amber-600 shadow-2xl">
+                  <h3 className="font-black text-amber-500 text-[10px] uppercase mb-6 tracking-[0.4em] border-b-2 border-amber-500/10 pb-4 italic text-center">Drink Inventory</h3>
+                  {Object.entries(drinkTally).map(([d, count]: any) => (
+                    <div key={d} className="flex justify-between py-4 border-b border-slate-800 last:border-0 font-black text-3xl items-center">
+                      <span className="text-slate-400 italic lowercase tracking-tighter truncate pr-4">{d}</span> 
+                      <span className="text-amber-500">x{count}</span>
                     </div>
-                ))}
+                  ))}
                 </div>
-            </div>
-            )}
+              </div>
+            );
+          })()}
+
 
           {/* THE COUNTER */}
             {activeTab === 'counter' && (
