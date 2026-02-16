@@ -145,6 +145,23 @@ export default function PizzaApp() {
     setEditingOrder(null);
   };
 
+  const deleteOrder = async () => {
+    if (!editingOrder || !editingOrder.id) return;
+    
+    if (confirm(`Remove ${editingOrder.player_name} from the list? \n\nThis cannot be undone.`)) {
+      // 1. Delete from Supabase
+      const { error } = await supabase.from('pizza_orders').delete().eq('id', editingOrder.id);
+      
+      if (!error) {
+        // 2. Close modal
+        setIsModalOpen(false);
+        setEditingOrder(null);
+        // 3. Refresh list (The realtime subscription will also catch this, but this is faster)
+        fetchOrders(); 
+      }
+    }
+  };
+
   const toggleStatus = async (id: string, field: string, current: boolean) => {
     await supabase.from('pizza_orders').update({ [field]: !current }).eq('id', id);
   };
@@ -300,18 +317,42 @@ export default function PizzaApp() {
                 <div className="space-y-3 pb-32">
                     {filtered.map(o => (
                     <div key={o.id} className="bg-[#1a1111] p-4 sm:p-5 rounded-[1.5rem] sm:rounded-[2rem] border-2 border-slate-900 flex justify-between items-center shadow-xl transition-all">
-                        <div className="flex-1 cursor-pointer min-w-0 pr-2" onClick={() => { setEditingOrder(o); setIsModalOpen(true); }}>
-                        <div className="font-black text-xl sm:text-3xl leading-tight text-white hover:text-amber-400 italic tracking-tighter transition-colors truncate">
+                        <div className="flex-1 cursor-pointer min-w-0 pr-4" onClick={() => { setEditingOrder(o); setIsModalOpen(true); }}>
+                        
+                        {/* Player Name */}
+                        <div className="font-black text-xl sm:text-3xl leading-tight text-white hover:text-amber-400 italic tracking-tighter transition-colors truncate mb-2">
                             {stripPrefix(o.player_name)}
                         </div>
-                        <div className="text-[10px] sm:text-xs font-black uppercase italic tracking-widest mt-1 sm:mt-2 flex flex-wrap items-center gap-2">
-                            <span className="text-amber-500">{o.topping}</span>
-                            <span className="text-red-600 bg-red-600/10 px-2 py-0.5 rounded border border-red-600/20 whitespace-nowrap">{o.slice_count} SLICES</span>
+
+                        {/* New "Count: Item" Layout */}
+                        <div className="flex flex-wrap items-center gap-2">
+                            
+                            {/* Pizza Badge */}
+                            <div className="flex items-center gap-2 bg-red-950/30 px-3 py-1.5 rounded-lg border border-red-900/30">
+                                <span className="text-lg">🍕</span>
+                                <div className="text-[10px] sm:text-xs font-black uppercase italic tracking-wider text-amber-500">
+                                    <span className="text-white text-sm sm:text-base mr-0.5">{o.slice_count}</span>: {o.topping}
+                                </div>
+                            </div>
+
+                            {/* Drink Badge */}
+                            <div className="flex items-center gap-2 bg-slate-800/40 px-3 py-1.5 rounded-lg border border-slate-700/30">
+                                <span className="text-lg">🥤</span>
+                                <div className="text-[10px] sm:text-xs font-black uppercase italic tracking-wider text-slate-400">
+                                    <span className="text-white text-sm sm:text-base mr-0.5">{o.drink_count}</span>: {o.drink}
+                                </div>
+                            </div>
+
                         </div>
                         </div>
+
+                        {/* Paid/Cash Button */}
                         <button 
                         onClick={() => toggleStatus(o.id, 'is_paid', o.is_paid)} 
-                        className={`shrink-0 px-4 py-3 sm:px-6 sm:py-4 rounded-xl sm:rounded-2xl font-black text-xs sm:text-md shadow-2xl transition-all border-b-4 active:translate-y-1 active:border-b-0 ${o.is_paid ? 'bg-green-600 text-white border-green-800 scale-105 shadow-green-900/40' : 'bg-slate-800 text-slate-600 border-slate-950 opacity-40'}`}
+                        className={`shrink-0 px-4 py-3 sm:px-6 sm:py-4 rounded-xl sm:rounded-2xl font-black text-xs sm:text-sm shadow-2xl transition-all border-b-4 active:translate-y-1 active:border-b-0 
+                            ${o.is_paid 
+                                ? 'bg-green-600 text-white border-green-800 scale-105 shadow-green-900/40' 
+                                : 'bg-slate-800 text-slate-600 border-slate-950 opacity-40'}`}
                         >
                         {o.is_paid ? 'PAID' : 'CASH'}
                         </button>
@@ -414,6 +455,23 @@ export default function PizzaApp() {
                     <label className="text-[10px] font-black text-red-800 uppercase tracking-widest absolute -top-2 left-4 bg-[#1e1515] px-2">Player Tag</label>
                     {/* Reduced text size for inputs on mobile */}
                     <input name="player_name" defaultValue={editingOrder?.player_name} placeholder="GamerTag" required className="w-full bg-black/40 p-4 sm:p-5 rounded-xl text-xl sm:text-2xl border-2 border-slate-900 text-white focus:border-amber-500 outline-none font-black italic shadow-inner" />
+                </div>
+                <div className="flex flex-col gap-3 mt-6">
+                  {/* SAVE BUTTON */}
+                  <button type="submit" className="w-full bg-red-700 text-white p-5 sm:p-6 rounded-2xl font-black text-xl sm:text-2xl border-b-8 border-red-950 active:translate-y-2 active:border-b-0 transition-all shadow-xl flex items-center justify-center gap-3 hover:bg-red-600">
+                    <Save size={24}/> {editingOrder ? 'UPDATE TICKET' : 'PRINT TICKET'}
+                  </button>
+
+                  {/* DELETE BUTTON - Only show if editing an existing order */}
+                  {editingOrder && (
+                    <button 
+                      type="button" // Important! Prevents form submission
+                      onClick={deleteOrder}
+                      className="w-full bg-black/20 text-red-500/50 p-4 rounded-xl font-black text-sm uppercase tracking-widest hover:bg-red-950/30 hover:text-red-500 transition-all flex items-center justify-center gap-2 border-2 border-transparent hover:border-red-900/30"
+                    >
+                      <Trash2 size={16} /> Delete Ticket
+                    </button>
+                  )}
                 </div>
 
                 <div className="grid grid-cols-5 gap-3 sm:gap-4">
