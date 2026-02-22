@@ -383,7 +383,7 @@ export default function PizzaApp() {
                     className={`shrink-0 px-4 py-3 sm:px-6 sm:py-4 rounded-xl sm:rounded-2xl font-black text-xs sm:text-sm shadow-2xl transition-all border-b-4 active:translate-y-1 active:border-b-0 
                             ${o.is_paid
                         ? 'bg-green-600 text-white border-green-800 scale-105 shadow-green-900/40'
-                        : 'bg-slate-800 text-slate-600 border-slate-950 opacity-40'}`}
+                        : 'bg-stone-900 text-stone-400 border-stone-950'}`}
                   >
                     {o.is_paid ? 'PAID' : 'CASH'}
                   </button>
@@ -519,7 +519,7 @@ export default function PizzaApp() {
               {filtered.filter(o => o.is_paid).map(o => (
                 <div key={o.id} className={`relative p-5 sm:p-8 rounded-[2rem] sm:rounded-[2.5rem] flex justify-between items-center gap-3 transition-all duration-500 overflow-hidden border-b-8
                         ${o.is_collected
-                    ? 'opacity-10 bg-black grayscale scale-95 border-transparent'
+                    ? 'opacity-40 bg-black grayscale scale-95 border-transparent'
                     : 'bg-[#1e1414] border-red-900 shadow-2xl ring-2 ring-white/5'
                   }`}
                 >
@@ -537,7 +537,7 @@ export default function PizzaApp() {
                     </div>
                   </div>
                   <button onClick={() => toggleStatus(o.id, 'is_collected', o.is_collected)} className={`shrink-0 px-6 py-6 sm:px-12 sm:py-10 rounded-2xl sm:rounded-[2.2rem] font-black text-lg sm:text-2xl shadow-2xl transition-all active:scale-90 z-10 border-b-4 sm:border-b-8
-                            ${o.is_collected ? 'bg-slate-900 text-slate-800 border-transparent' : 'bg-gradient-to-br from-red-600 to-red-800 text-white border-red-950 shadow-red-950/40'}`}
+                            ${o.is_collected ? 'bg-black/40 text-slate-400 border-slate-900' : 'bg-gradient-to-br from-red-600 to-red-800 text-white border-red-950 shadow-red-950/40'}`}
                   >
                     {o.is_collected ? 'DONE' : 'SERVE!'}
                   </button>
@@ -675,9 +675,9 @@ export default function PizzaApp() {
 
 function NavBtn({ icon, active, onClick, label }: any) {
   return (
-    <button onClick={onClick} className={`flex flex-col items-center gap-1 transition-all duration-300 ${active ? 'text-amber-500 scale-125 -translate-y-2' : 'text-slate-800'}`}>
+    <button onClick={onClick} className={`flex flex-col items-center gap-1 transition-all duration-300 ${active ? 'text-amber-500 scale-125 -translate-y-2' : 'text-slate-500'}`}>
       <div className={`p-1 rounded-lg ${active ? 'bg-amber-500/10' : ''}`}>{icon}</div>
-      <span className={`text-[9px] font-black uppercase tracking-[0.2em] italic ${active ? 'opacity-100' : 'opacity-100 text-slate-800'}`}>{label}</span>
+      <span className={`text-[9px] font-black uppercase tracking-[0.2em] italic ${active ? 'opacity-100' : 'opacity-100 text-slate-500'}`}>{label}</span>
     </button>
   );
 }
