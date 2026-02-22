@@ -105,7 +105,7 @@ export default function PizzaApp() {
 
   const stripPrefix = (name: string) => {
     if (!name) return "";
-    return name.includes('|') ? name.split('|')[1].trim() : name;
+    return name.includes('|') ? name.split('|').pop()!.trim() : name;
   };
 
   const handleUpload = (e: any) => {
@@ -177,11 +177,24 @@ export default function PizzaApp() {
 
   return (
     <div className="h-screen bg-[#0d0909] flex flex-col overflow-hidden text-slate-100 font-sans">
-      <style jsx global>{` ::-webkit-scrollbar { display: none; } * { -ms-overflow-style: none; scrollbar-width: none; } `}</style>
+      <style jsx global>{`
+        ::-webkit-scrollbar { display: none; }
+        * { -ms-overflow-style: none; scrollbar-width: none; }
+        .pizza-pattern {
+          background-image: linear-gradient(45deg, #fff 25%, transparent 25%, transparent 75%, #fff 75%, #fff), 
+                            linear-gradient(45deg, #fff 25%, transparent 25%, transparent 75%, #fff 75%, #fff);
+          background-size: 20px 20px;
+          background-position: 0 0, 10px 10px;
+        }
+        .modal-pattern {
+          background-image: radial-gradient(circle, transparent 70%, #1e1515 70%);
+          background-size: 20px 20px;
+        }
+      `}</style>
 
       {/* HEADER */}
       <header className="bg-red-700 p-6 text-white flex-none flex justify-between items-center shadow-[0_4px_30px_rgba(0,0,0,0.6)] border-b-4 border-amber-600 overflow-hidden relative">
-        <div className="absolute inset-0 opacity-10 pointer-events-none" style={{ backgroundImage: `linear-gradient(45deg, #fff 25%, transparent 25%, transparent 75%, #fff 75%, #fff), linear-gradient(45deg, #fff 25%, transparent 25%, transparent 75%, #fff 75%, #fff)`, backgroundSize: '20px 20px', backgroundPosition: '0 0, 10px 10px' }}></div>
+        <div className="absolute inset-0 opacity-10 pointer-events-none pizza-pattern"></div>
         <div className="z-10 flex items-center gap-3">
           <Pizza className="text-amber-400 drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]" size={32} />
           <h1 className="font-black text-2xl uppercase tracking-tighter italic drop-shadow-lg">
@@ -222,7 +235,13 @@ export default function PizzaApp() {
                     onKeyDown={(e) => e.key === 'Enter' && confirmSlug(inputSlug)}
                     placeholder="e.g. weekly-smash-40"
                   />
-                  <button onClick={() => confirmSlug(inputSlug)} className="bg-amber-500 text-black px-4 rounded-xl font-black shadow-lg shadow-amber-500/10"><ChevronRight /></button>
+                  <button
+                    onClick={() => confirmSlug(inputSlug)}
+                    className="bg-amber-500 text-black px-4 rounded-xl font-black shadow-lg shadow-amber-500/10"
+                    aria-label="Confirm Tournament Slug"
+                  >
+                    <ChevronRight />
+                  </button>
                 </div>
 
                 <label className="block w-full bg-red-600/5 border-4 border-dashed border-red-600/20 p-8 rounded-[2rem] text-center hover:bg-red-600/10 cursor-pointer group transition-all">
@@ -243,6 +262,7 @@ export default function PizzaApp() {
                     value={newMenuCategory}
                     onChange={(e) => setNewMenuCategory(e.target.value)}
                     className="bg-black/40 border-2 border-slate-800 p-3 rounded-xl text-white font-bold outline-none focus:border-amber-500"
+                    aria-label="New Menu Item Category"
                   >
                     <option value="topping">Topping</option>
                     <option value="drink">Drink</option>
@@ -270,7 +290,11 @@ export default function PizzaApp() {
                       {menu.toppings.map(item => (
                         <div key={item.id} className="flex justify-between items-center group">
                           <span className="font-bold text-slate-300 italic">{item.label}</span>
-                          <button onClick={() => deleteMenuItem(item.id)} className="text-slate-700 hover:text-red-500 transition-colors opacity-50 group-hover:opacity-100">
+                          <button
+                            onClick={() => deleteMenuItem(item.id)}
+                            className="text-slate-700 hover:text-red-500 transition-colors opacity-50 group-hover:opacity-100"
+                            aria-label={`Delete ${item.label}`}
+                          >
                             <Trash2 size={16} />
                           </button>
                         </div>
@@ -285,7 +309,11 @@ export default function PizzaApp() {
                       {menu.drinks.map(item => (
                         <div key={item.id} className="flex justify-between items-center group">
                           <span className="font-bold text-slate-300 italic">{item.label}</span>
-                          <button onClick={() => deleteMenuItem(item.id)} className="text-slate-700 hover:text-red-500 transition-colors opacity-50 group-hover:opacity-100">
+                          <button
+                            onClick={() => deleteMenuItem(item.id)}
+                            className="text-slate-700 hover:text-red-500 transition-colors opacity-50 group-hover:opacity-100"
+                            aria-label={`Delete ${item.label}`}
+                          >
                             <Trash2 size={16} />
                           </button>
                         </div>
@@ -308,6 +336,7 @@ export default function PizzaApp() {
               <input
                 className="w-full p-4 pl-12 sm:p-5 sm:pl-16 rounded-[2rem] sm:rounded-[2.5rem] border-4 border-slate-900 bg-[#161010] text-white text-lg sm:text-xl shadow-2xl focus:border-amber-500 outline-none transition-all font-bold"
                 placeholder="Search..."
+                aria-label="Search Orders"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
               />
@@ -520,7 +549,11 @@ export default function PizzaApp() {
       </main>
 
       {/* PIZZA ADD BUTTON */}
-      <button onClick={() => { setEditingOrder(null); setIsModalOpen(true); }} className="fixed right-6 bottom-36 bg-gradient-to-t from-amber-600 to-amber-400 text-red-950 p-6 rounded-full shadow-[0_15px_50px_rgba(245,158,11,0.3)] active:scale-75 transition-all z-30 border-4 border-[#0d0909]">
+      <button
+        onClick={() => { setEditingOrder(null); setIsModalOpen(true); }}
+        className="fixed right-6 bottom-36 bg-gradient-to-t from-amber-600 to-amber-400 text-red-950 p-6 rounded-full shadow-[0_15px_50px_rgba(245,158,11,0.3)] active:scale-75 transition-all z-30 border-4 border-[#0d0909]"
+        aria-label="Add New Pizza Ticket"
+      >
         <Plus size={36} strokeWidth={4} />
       </button>
 
@@ -529,24 +562,32 @@ export default function PizzaApp() {
         <div className="fixed inset-0 bg-black/95 backdrop-blur-xl z-50 flex items-center justify-center p-4 sm:p-6 animate-in fade-in duration-200">
           {/* Changed p-8 to p-6 for mobile */}
           <div className="bg-[#1e1515] w-full max-w-lg rounded-[2rem] p-6 sm:p-8 border-x-8 border-red-900/50 shadow-[0_0_100px_rgba(211,47,47,0.15)] relative overflow-hidden">
-            <div className="absolute top-0 left-0 right-0 h-2 bg-red-700 opacity-50" style={{ backgroundImage: 'radial-gradient(circle, transparent 70%, #1e1515 70%)', backgroundSize: '20px 20px' }}></div>
+            <div className="absolute top-0 left-0 right-0 h-2 bg-red-700 opacity-50 modal-pattern"></div>
 
-            <button onClick={() => { setIsModalOpen(false); setEditingOrder(null); }} className="absolute top-4 right-4 sm:top-6 sm:right-6 text-slate-700 hover:text-red-500 transition-colors"><X size={28} /></button>
+            <button
+              onClick={() => { setIsModalOpen(false); setEditingOrder(null); }}
+              className="absolute top-4 right-4 sm:top-6 sm:right-6 text-slate-700 hover:text-red-500 transition-colors"
+              aria-label="Close Modal"
+            >
+              <X size={28} />
+            </button>
 
             <h2 className="text-2xl sm:text-3xl font-black mb-6 sm:mb-8 uppercase italic text-amber-500 tracking-tighter">{editingOrder ? 'Edit Ticket' : 'New Ticket'}</h2>
 
             <form onSubmit={saveManualOrder} className="space-y-5 sm:space-y-6">
               <div className="relative">
-                <label className="text-[10px] font-black text-red-800 uppercase tracking-widest absolute -top-2 left-4 bg-[#1e1515] px-2">Player Tag</label>
+                <label htmlFor="player-tag" className="text-[10px] font-black text-red-800 uppercase tracking-widest absolute -top-2 left-4 bg-[#1e1515] px-2">Player Tag</label>
                 {/* Reduced text size for inputs on mobile */}
-                <input name="player_name" defaultValue={editingOrder?.player_name} placeholder="GamerTag" required className="w-full bg-black/40 p-4 sm:p-5 rounded-xl text-xl sm:text-2xl border-2 border-slate-900 text-white focus:border-amber-500 outline-none font-black italic shadow-inner" />
+                <input
+                  id="player-tag"
+                  name="player_name"
+                  defaultValue={editingOrder?.player_name}
+                  placeholder="GamerTag"
+                  required
+                  className="w-full bg-black/40 p-4 sm:p-5 rounded-xl text-xl sm:text-2xl border-2 border-slate-900 text-white focus:border-amber-500 outline-none font-black italic shadow-inner"
+                />
               </div>
-              <div className="flex flex-col gap-3 mt-6">
-                {/* SAVE BUTTON */}
-                <button type="submit" className="w-full bg-red-700 text-white p-5 sm:p-6 rounded-2xl font-black text-xl sm:text-2xl border-b-8 border-red-950 active:translate-y-2 active:border-b-0 transition-all shadow-xl flex items-center justify-center gap-3 hover:bg-red-600">
-                  <Save size={24} /> {editingOrder ? 'UPDATE TICKET' : 'PRINT TICKET'}
-                </button>
-
+              <div className="flex flex-col gap-3">
                 {/* DELETE BUTTON - Only show if editing an existing order */}
                 {editingOrder && (
                   <button
@@ -561,31 +602,55 @@ export default function PizzaApp() {
 
               <div className="grid grid-cols-5 gap-3 sm:gap-4">
                 <div className="col-span-3 relative">
-                  <label className="text-[10px] font-black text-red-800 uppercase tracking-widest absolute -top-2 left-4 bg-[#1e1515] px-2">Topping</label>
-                  <select name="topping" defaultValue={editingOrder?.topping || 'Pepperoni'} className="w-full bg-black/40 p-4 sm:p-5 rounded-xl text-md sm:text-lg text-white border-2 border-slate-900 font-black italic appearance-none focus:border-amber-500">
+                  <label htmlFor="topping-select" className="text-[10px] font-black text-red-800 uppercase tracking-widest absolute -top-2 left-4 bg-[#1e1515] px-2">Topping</label>
+                  <select
+                    id="topping-select"
+                    name="topping"
+                    defaultValue={editingOrder?.topping || 'Pepperoni'}
+                    className="w-full bg-black/40 p-4 sm:p-5 rounded-xl text-md sm:text-lg text-white border-2 border-slate-900 font-black italic appearance-none focus:border-amber-500"
+                    aria-label="Select Topping"
+                  >
                     {menu.toppings.map(t => (
                       <option key={t.id} value={t.label} className="bg-slate-900">{t.label}</option>
                     ))}
                   </select>
                 </div>
                 <div className="col-span-2 relative">
-                  <label className="text-[10px] font-black text-red-800 uppercase tracking-widest absolute -top-2 left-4 bg-[#1e1515] px-2 flex items-center gap-1"><Hash size={10} /> Slices</label>
-                  <input name="slice_count" type="number" defaultValue={editingOrder?.slice_count || 2} className="w-full bg-black/40 p-4 sm:p-5 rounded-xl text-md sm:text-lg text-white border-2 border-slate-900 font-black focus:border-amber-500 outline-none" />
+                  <label htmlFor="slice-count" className="text-[10px] font-black text-red-800 uppercase tracking-widest absolute -top-2 left-4 bg-[#1e1515] px-2 flex items-center gap-1"><Hash size={10} /> Slices</label>
+                  <input
+                    id="slice-count"
+                    name="slice_count"
+                    type="number"
+                    defaultValue={editingOrder?.slice_count || 2}
+                    className="w-full bg-black/40 p-4 sm:p-5 rounded-xl text-md sm:text-lg text-white border-2 border-slate-900 font-black focus:border-amber-500 outline-none"
+                  />
                 </div>
               </div>
 
               <div className="grid grid-cols-5 gap-3 sm:gap-4">
                 <div className="col-span-3 relative">
-                  <label className="text-[10px] font-black text-red-800 uppercase tracking-widest absolute -top-2 left-4 bg-[#1e1515] px-2">Drink</label>
-                  <select name="drink" defaultValue={editingOrder?.drink || 'Coke'} className="w-full bg-black/40 p-4 sm:p-5 rounded-xl text-md sm:text-lg text-white border-2 border-slate-900 font-black italic appearance-none focus:border-amber-500">
+                  <label htmlFor="drink-select" className="text-[10px] font-black text-red-800 uppercase tracking-widest absolute -top-2 left-4 bg-[#1e1515] px-2">Drink</label>
+                  <select
+                    id="drink-select"
+                    name="drink"
+                    defaultValue={editingOrder?.drink || 'Coke'}
+                    className="w-full bg-black/40 p-4 sm:p-5 rounded-xl text-md sm:text-lg text-white border-2 border-slate-900 font-black italic appearance-none focus:border-amber-500"
+                    aria-label="Select Drink"
+                  >
                     {menu.drinks.map(d => (
                       <option key={d.id} value={d.label} className="bg-slate-900">{d.label}</option>
                     ))}
                   </select>
                 </div>
                 <div className="col-span-2 relative">
-                  <label className="text-[10px] font-black text-red-800 uppercase tracking-widest absolute -top-2 left-4 bg-[#1e1515] px-2 flex items-center gap-1"><Beer size={10} /> Qty</label>
-                  <input name="drink_count" type="number" defaultValue={editingOrder?.drink_count || 1} className="w-full bg-black/40 p-4 sm:p-5 rounded-xl text-md sm:text-lg text-white border-2 border-slate-900 font-black focus:border-amber-500 outline-none" />
+                  <label htmlFor="drink-count" className="text-[10px] font-black text-red-800 uppercase tracking-widest absolute -top-2 left-4 bg-[#1e1515] px-2 flex items-center gap-1"><Beer size={10} /> Qty</label>
+                  <input
+                    id="drink-count"
+                    name="drink_count"
+                    type="number"
+                    defaultValue={editingOrder?.drink_count || 1}
+                    className="w-full bg-black/40 p-4 sm:p-5 rounded-xl text-md sm:text-lg text-white border-2 border-slate-900 font-black focus:border-amber-500 outline-none"
+                  />
                 </div>
               </div>
 
